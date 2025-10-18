@@ -15,7 +15,7 @@
   <artifactId>demo</artifactId>
   <version>0.0.1-SNAPSHOT</version>
   <name>demo</name>
-  <description>Demo project for Spring Boot + Oracle XE</description>
+  <description>Demo project for Spring Boot + Oracle XE + Thymeleaf</description>
 
   <properties>
     <java.version>21</java.version>
@@ -23,38 +23,50 @@
 
   <dependencies>
 
-    <!-- Starter Web (controladores, Tomcat, etc.) -->
+    <!-- Web MVC/REST -->
     <dependency>
       <groupId>org.springframework.boot</groupId>
       <artifactId>spring-boot-starter-web</artifactId>
     </dependency>
 
-    <!-- Starter JDBC (requerido para DataSource y JdbcTemplate) -->
+    <!-- Vistas Thymeleaf -->
+    <dependency>
+      <groupId>org.springframework.boot</groupId>
+      <artifactId>spring-boot-starter-thymeleaf</artifactId>
+    </dependency>
+
+    <!-- JDBC (DataSource) -->
     <dependency>
       <groupId>org.springframework.boot</groupId>
       <artifactId>spring-boot-starter-jdbc</artifactId>
     </dependency>
 
-    <!-- Starter JPA / Hibernate (si usas entidades y repositorios) -->
+    <!-- JPA / Hibernate -->
     <dependency>
       <groupId>org.springframework.boot</groupId>
       <artifactId>spring-boot-starter-data-jpa</artifactId>
     </dependency>
 
-    <!-- Driver JDBC de Oracle (compatible con Java 21+) -->
+    <!-- Oracle JDBC -->
     <dependency>
       <groupId>com.oracle.database.jdbc</groupId>
       <artifactId>ojdbc11</artifactId>
       <version>23.4.0.24.05</version>
     </dependency>
 
-    <!-- Validación opcional (para @NotNull, @Email, etc.) -->
+    <!-- Bean Validation -->
     <dependency>
       <groupId>org.springframework.boot</groupId>
       <artifactId>spring-boot-starter-validation</artifactId>
     </dependency>
 
-    <!-- Dependencia para pruebas -->
+    <!-- BCrypt (encriptación de contraseñas) -->
+    <dependency>
+      <groupId>org.springframework.security</groupId>
+      <artifactId>spring-security-crypto</artifactId>
+    </dependency>
+
+    <!-- Tests -->
     <dependency>
       <groupId>org.springframework.boot</groupId>
       <artifactId>spring-boot-starter-test</artifactId>
@@ -71,5 +83,4 @@
       </plugin>
     </plugins>
   </build>
-
 </project>
