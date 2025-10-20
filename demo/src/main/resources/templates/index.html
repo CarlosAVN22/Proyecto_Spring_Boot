@@ -2,25 +2,206 @@
 <html lang="es" xmlns:th="http://www.thymeleaf.org">
 <head>
   <meta charset="utf-8">
-  <title>Bienvenido - Travel Central</title>
+  <title>Bienvenido - Tourify</title>
   <meta name="viewport" content="width=device-width, initial-scale=1">
+  <!-- Bootstrap -->
   <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet">
+
+  <style>
+    :root{
+      /* Paleta coherente y accesible */
+      --primary: #355f7e;   /* azul pizarra (no chillante) */
+      --accent:  #569fa4;   /* teal suave */
+      --text:    #0f172a;   /* slate-900 */
+      --muted:   #667085;
+
+      --focus: 0 0 0 3px rgba(53,95,126,.25);
+
+      /* UI */
+      --radius-lg: 14px;
+      --shadow-sm: 0 1px 2px rgba(15,23,42,.06);
+      --shadow-md: 0 8px 18px rgba(15,23,42,.10);
+      --modal-bg: rgba(255,255,255,.84); /* un poco más transparente que antes, pero no “lavado” */
+      --modal-header-bg: linear-gradient(180deg, rgba(255,255,255,.96), rgba(255,255,255,.85));
+    }
+
+    html, body { height: 100%; }
+    body{
+      margin: 0;
+      color: var(--text);
+      font-family: ui-sans-serif, -apple-system, BlinkMacSystemFont, "SF Pro Text", "Segoe UI", Inter, Roboto, Arial, sans-serif;
+      letter-spacing: .2px;
+      overflow: hidden; /* evita scroll por fondos absolutos */
+    }
+
+    /* ============= Fondo: slideshow con cross-fade ============= */
+    .bg-stage{
+      position: fixed;
+      inset: 0;
+      z-index: -2;
+      overflow: hidden;
+      background: #e9ecef; /* gris de base al cargar */
+    }
+    .bg-layer{
+      position: absolute;
+      inset: 0;
+      background-position: center;
+      background-size: cover;
+      background-repeat: no-repeat;
+      opacity: 0;
+      transition: opacity 1.2s ease;
+      will-change: opacity;
+    }
+    .bg-layer.show{ opacity: 1; }
+
+    /* Overlay para contraste (deja ver la foto pero baja brillo) */
+    .bg-overlay{
+      position: fixed;
+      inset: 0;
+      z-index: -1;
+      pointer-events: none;
+      /* degradé gris cálido + leve tinte oscuro */
+      background:
+        radial-gradient(1200px 800px at 15% 0%, rgba(248,249,250,.35) 0%, transparent 65%),
+        radial-gradient(1000px 700px at 85% 10%, rgba(241,243,245,.35) 0%, transparent 65%),
+        linear-gradient(0deg, rgba(15,23,42,.22), rgba(15,23,42,.22));
+      backdrop-filter: saturate(120%) blur(2px);
+      -webkit-backdrop-filter: saturate(120%) blur(2px);
+    }
+
+    /* ============= Contenido centrado ============= */
+    .main-wrap{
+      position: relative;
+      z-index: 1;
+      min-height: 100dvh;
+      display: grid;
+      place-items: center;
+      padding: 2rem 1rem;
+      text-align: center;
+    }
+
+    .brand-title{
+      margin: 0 0 .5rem;
+      font-weight: 900;
+      letter-spacing: .4px;
+      color: #fff;             /* título blanco sobre fondo con overlay */
+      text-shadow: 0 2px 18px rgba(0,0,0,.22);
+      font-size: clamp(2rem, 4.5vw, 3.2rem); /* más grande */
+    }
+    .brand-subtitle{
+      color: #eef2f6;
+      font-size: clamp(1rem, 2.6vw, 1.25rem);
+      margin-bottom: 1.6rem;
+      text-shadow: 0 1px 12px rgba(0,0,0,.18);
+    }
+
+    /* Botones más grandes, minimal */
+    .btn-soft-primary{
+      background: var(--primary);
+      color: #fff;
+      border: 0;
+      border-radius: 999px;
+      padding: 1rem 1.5rem;              /* más grande */
+      font-size: 1.05rem;
+      box-shadow: var(--shadow-sm);
+      transition: transform .05s ease, filter .2s ease, box-shadow .2s ease;
+    }
+    .btn-soft-primary:hover{ filter: brightness(1.05); box-shadow: var(--shadow-md); }
+    .btn-soft-primary:active{ transform: translateY(1px); }
+
+    .btn-soft-outline{
+      background: rgba(255,255,255,.12);
+      color: #fff;
+      border: 1px solid rgba(255,255,255,.45);
+      border-radius: 999px;
+      padding: 1rem 1.5rem;              /* más grande */
+      font-size: 1.05rem;
+      box-shadow: var(--shadow-sm);
+      transition: background .2s ease, box-shadow .2s ease, transform .05s ease;
+    }
+    .btn-soft-outline:hover{ background: rgba(255,255,255,.18); box-shadow: var(--shadow-md); }
+    .btn-soft-outline:active{ transform: translateY(1px); }
+
+    /* Espaciado entre botones en mobile */
+    .btns{ display: inline-flex; gap: .75rem; flex-wrap: wrap; justify-content: center; }
+
+    /* ============= Modales minimal y un “poco más” transparentes ============= */
+    .modal-dialog{ margin-top: 7vh; }
+    .modal-content{
+      border: 1px solid rgba(15,23,42,.08);
+      border-radius: var(--radius-lg);
+      background: var(--modal-bg);
+      backdrop-filter: saturate(150%) blur(7px);
+      -webkit-backdrop-filter: saturate(150%) blur(7px);
+      box-shadow: var(--shadow-md);
+    }
+    .modal-header{
+      border-bottom: 1px solid rgba(15,23,42,.06);
+      background: var(--modal-header-bg);
+      border-top-left-radius: var(--radius-lg);
+      border-top-right-radius: var(--radius-lg);
+      display: flex; align-items: center; justify-content: center; position: relative;
+    }
+    .modal-title{
+      font-weight: 700; letter-spacing: .2px; text-align: center; width: 100%; margin: 0; color: var(--text);
+    }
+    .modal-header .btn-close{ position: absolute; right: .75rem; top: .75rem; }
+
+    /* Inputs */
+    .form-label{ font-weight: 600; color: #232b3a; }
+    .form-control{
+      border-radius: 12px;
+      border: 1px solid rgba(15,23,42,.14);
+      background: #fff;
+      padding: .9rem 1rem;
+      transition: box-shadow .2s ease, border-color .2s ease;
+    }
+    .form-control::placeholder{ color: #98a2b3; }
+    .form-control:focus{
+      border-color: rgba(53,95,126,.55);
+      box-shadow: var(--focus);
+      background: #fff;
+    }
+
+    /* Accesibilidad */
+    :focus-visible{
+      outline: none;
+      box-shadow: var(--focus) !important;
+      border-color: rgba(53,95,126,.55) !important;
+    }
+
+    /* Respeta usuarios con reducciones de movimiento */
+    @media (prefers-reduced-motion: reduce) {
+      .bg-layer{ transition: none !important; }
+    }
+  </style>
 </head>
 
-<body class="bg-light d-flex flex-column justify-content-center align-items-center vh-100">
+<body>
 
-  <div class="text-center">
-    <h1 class="mb-3 fw-bold text-primary">🌎 Travel Central</h1>
-    <p class="mb-4 text-muted">Explora los mejores lugares de Centroamérica</p>
-
-    <!-- Botones principales -->
-    <button class="btn btn-primary me-2" data-bs-toggle="modal" data-bs-target="#loginModal">Iniciar sesión</button>
-    <button class="btn btn-outline-primary" data-bs-toggle="modal" data-bs-target="#registerModal">Registrarse</button>
+  <!-- Escenario de fondo con dos capas para cross-fade -->
+  <div class="bg-stage">
+    <div id="bgA" class="bg-layer show"></div>
+    <div id="bgB" class="bg-layer"></div>
   </div>
+  <div class="bg-overlay" aria-hidden="true"></div>
+
+  <!-- Contenido centrado -->
+  <main class="main-wrap">
+    <section>
+      <h1 class="brand-title">Tourify</h1>
+      <p class="brand-subtitle">Explora los mejores lugares de Centroamérica</p>
+
+      <div class="btns">
+        <button class="btn btn-soft-outline" data-bs-toggle="modal" data-bs-target="#loginModal">Iniciar sesión</button>
+        <button class="btn btn-soft-outline" data-bs-toggle="modal" data-bs-target="#registerModal">Registrarse</button>
+      </div>
+    </section>
+  </main>
 
   <!-- Modal de Inicio de Sesión -->
   <div class="modal fade" id="loginModal" tabindex="-1" aria-hidden="true">
-    <div class="modal-dialog">
+    <div class="modal-dialog modal-dialog-centered">
       <div class="modal-content">
         <div class="modal-header">
           <h5 class="modal-title">Iniciar sesión</h5>
@@ -36,7 +217,7 @@
               <label for="password" class="form-label">Contraseña</label>
               <input type="password" class="form-control" id="password" placeholder="••••••••" required>
             </div>
-            <button type="submit" class="btn btn-primary w-100">Entrar</button>
+            <button type="submit" class="btn btn-soft-primary w-100">Entrar</button>
           </form>
           <div id="loginError" class="text-danger small mt-2" style="display:none;"></div>
         </div>
@@ -46,7 +227,7 @@
 
   <!-- Modal de Registro -->
   <div class="modal fade" id="registerModal" tabindex="-1" aria-hidden="true">
-    <div class="modal-dialog modal-lg">
+    <div class="modal-dialog modal-lg modal-dialog-centered">
       <div class="modal-content">
         <div class="modal-header">
           <h5 class="modal-title">Crear cuenta</h5>
@@ -92,7 +273,7 @@
               </div>
             </div>
 
-            <button type="submit" class="btn btn-success w-100 mt-2">Registrar</button>
+            <button type="submit" class="btn btn-soft-primary w-100 mt-2">Registrar</button>
           </form>
           <div id="registerError" class="text-danger small mt-2" style="display:none;"></div>
         </div>
@@ -100,10 +281,51 @@
     </div>
   </div>
 
+  <!-- Bootstrap JS -->
   <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
 
   <script>
-    // Helper para POST JSON
+    // ===== Fondo: carrusel de imágenes con cross-fade =====
+    // Reemplaza con tus imágenes (pueden ser locales o URLs absolutas)
+    const BG_IMAGES = [
+      'https://asuaire.com/blog/wp-content/uploads/2017/12/arenal-960x640.png',
+      'https://imgcap.capturetheatlas.com/wp-content/uploads/2020/11/Countries-allowed-to-travel-to-Honduras.jpg',
+      'https://cdn.republica.com/042023/1680413997053.jpg?cw=1500&ch=788',
+      'https://i0.wp.com/rrppguatemala.com/wp-content/uploads/2023/02/Conoce-los-lugares-turisticos-mas-famosos-de-Guatemala-Lago-de-Atitlan.jpg?fit=3736%2C2475&ssl=1'
+    ];
+    const INTERVAL_MS = 8000; // cada 8s
+
+    const bgA = document.getElementById('bgA');
+    const bgB = document.getElementById('bgB');
+    let idx = 0, showingA = true;
+
+    function setBackground(el, url){
+      el.style.backgroundImage = `url("${url}")`;
+    }
+
+    // Pre-carga simple
+    BG_IMAGES.forEach(src => { const img = new Image(); img.src = src; });
+
+    // Estado inicial
+    setBackground(bgA, BG_IMAGES[0]);
+    bgA.classList.add('show');
+    setBackground(bgB, BG_IMAGES[1 % BG_IMAGES.length]);
+
+    setInterval(() => {
+      idx = (idx + 1) % BG_IMAGES.length;
+      if(showingA){
+        setBackground(bgB, BG_IMAGES[idx]);
+        bgB.classList.add('show');
+        bgA.classList.remove('show');
+      } else {
+        setBackground(bgA, BG_IMAGES[idx]);
+        bgA.classList.add('show');
+        bgB.classList.remove('show');
+      }
+      showingA = !showingA;
+    }, INTERVAL_MS);
+
+    // ===== Helpers de API (tu lógica) =====
     async function postJson(url, data) {
       const res = await fetch(url, {
         method: 'POST',
@@ -119,7 +341,7 @@
     const loginForm = document.getElementById('loginForm');
     const loginError = document.getElementById('loginError');
 
-    loginForm.addEventListener('submit', async (e) => {
+    loginForm?.addEventListener('submit', async (e) => {
       e.preventDefault();
       loginError.style.display = 'none';
 
@@ -128,7 +350,6 @@
 
       const { ok, json } = await postJson('/api/auth/login', { email, password });
       if (ok) {
-        // Cierra el modal y redirige
         const modalEl = document.getElementById('loginModal');
         bootstrap.Modal.getInstance(modalEl)?.hide();
         window.location.href = '/paises';
@@ -142,7 +363,7 @@
     const registerForm = document.getElementById('registerForm');
     const registerError = document.getElementById('registerError');
 
-    registerForm.addEventListener('submit', async (e) => {
+    registerForm?.addEventListener('submit', async (e) => {
       e.preventDefault();
       registerError.style.display = 'none';
 
@@ -164,10 +385,8 @@
         { nombre, apellido, email, password, dui, telefono });
 
       if (ok) {
-        // Cierra modal y abre login
         const regModal = document.getElementById('registerModal');
         bootstrap.Modal.getInstance(regModal)?.hide();
-        // Abre el modal de login para que el usuario entre
         const loginModal = new bootstrap.Modal(document.getElementById('loginModal'));
         loginModal.show();
       } else {
