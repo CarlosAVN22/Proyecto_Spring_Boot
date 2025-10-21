@@ -47,7 +47,7 @@
         <div class="col-12">
           <small class="text-secondary">Categoría</small>
           <div id="catGrid" class="row g-3 mt-1">
-            <!-- Tiles fijos; puedes ajustar imágenes/códigos -->
+            <!-- Tiles fijos -->
             <div class="col-6 col-md-3">
               <div class="tile" data-code="HOTEL">
                 <img src="https://images.unsplash.com/photo-1542314831-068cd1dbfeeb?q=80&w=1200&auto=format&fit=crop" alt="">
@@ -73,11 +73,11 @@
               </div>
             </div>
             <div class="col-6 col-md-3">
-              <div class="tile" data-code="RESTAURANTE">
-                <img src="https://images.unsplash.com/photo-1521017432531-fbd92d275ae8?q=80&w=1200&auto=format&fit=crop" alt="">
-                <div class="t-body"><strong>Restaurante</strong></div>
-              </div>
-            </div>
+  <div class="tile" data-code="RESTAURANTE">
+    <img src="https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcT3zPwVC0Mm-Ux4JCVnXM6e7DAtqndYXqENew&s" alt="">
+    <div class="t-body"><strong>Restaurante</strong></div>
+  </div>
+</div>
             <div class="col-6 col-md-3">
               <div class="tile" data-code="MUSEO">
                 <img src="https://images.unsplash.com/photo-1530026405186-ed1f139313f8?q=80&w=1200&auto=format&fit=crop" alt="">
@@ -122,6 +122,37 @@
   <script th:inline="javascript">
     const paisId = /*[[${paisId}]]*/ 0;
 
+    // -------- Helpers imagen/refresh --------
+    const PLACEHOLDER = 'data:image/svg+xml;utf8,<svg xmlns="http://www.w3.org/2000/svg" width="800" height="450"><rect width="100%" height="100%" fill="%23111"/><text x="50%" y="50%" dominant-baseline="middle" text-anchor="middle" fill="%23888" font-family="Arial" font-size="20">sin imagen</text></svg>';
+    const isHttp = u => typeof u === 'string' && /^https?:\/\//i.test(u);
+
+    function bestImage(obj){
+      if(!obj) return '';
+      // Si viene lista de strings:
+      if (Array.isArray(obj.imagenes) && typeof obj.imagenes[0] === 'string') {
+        const s = obj.imagenes.find(isHttp);
+        if (s) return s;
+      }
+      // Lista de objetos con url:
+      if (Array.isArray(obj.imagenes) && obj.imagenes.length && obj.imagenes[0]?.url) {
+        const s = obj.imagenes.map(x=>x?.url).find(isHttp);
+        if (s) return s;
+      }
+      if (Array.isArray(obj.images) && obj.images.length) {
+        const s = obj.images.map(x=>x?.url || x).find(isHttp);
+        if (s) return s;
+      }
+      const candidates = [
+        obj.imagenPrincipal,
+        obj.imagenUrl, obj.urlImagen,
+        obj?.imagen?.url, obj?.image?.url,
+        obj.foto, obj.fotoUrl, obj.thumbnail, obj.thumbUrl
+      ].filter(Boolean);
+      const http = candidates.find(isHttp);
+      return http || '';
+    }
+
+    // -------- Estado filtros --------
     let categoriaCodigo = "";
     let minEstrellas = "";
 
@@ -149,23 +180,38 @@
       });
     });
 
+    // botón buscar
     document.getElementById('btnBuscar').addEventListener('click', (e)=>{
       e.preventDefault();
       buscar();
     });
 
+    // auto-refresh al escribir (debounce)
+    function debounce(fn, ms=400){
+      let t; return (...args)=>{ clearTimeout(t); t=setTimeout(()=>fn(...args), ms); };
+    }
+    document.getElementById('nombre').addEventListener('input', debounce(()=>buscar()));
+    document.getElementById('maxPrecio').addEventListener('input', debounce(()=>buscar()));
+
+    // -------- Render tarjeta --------
     function card(item){
       const est = item.promedioEstrellas ?? 0;
-      const estrellas = (est?.toFixed ? est.toFixed(1) : est);
+      const estrellas = (typeof est === 'number' && est.toFixed) ? est.toFixed(1) : est;
       const precio = (item.precio!=null) ? ('$'+item.precio) : '—';
+      const img = bestImage(item) || PLACEHOLDER;
+      const id = item.lugarId ?? item.id ?? '';
+      const nombre = item.lugar ?? item.nombre ?? '';
+      const categoria = item.categoria ?? item.categoriaNombre ?? item.categoriaCodigo ?? '';
+      const ciudad = item.ciudad ?? item.ciudadNombre ?? '';
+
       return `
       <div class="col">
         <article class="card-soft">
-          <a th:href="@{'/lugar/' + ${item.lugarId}}" href="/lugar/${item.lugarId}">
-            ${item.imagenPrincipal ? `<div class="media"><img src="${item.imagenPrincipal}" alt=""></div>`:''}
+          <a href="/lugar/${id}">
+            <div class="media"><img src="${img}" alt=""></div>
             <div class="p-3">
-              <h3 class="h6 m-0">${item.lugar ?? ''}</h3>
-              <div class="small text-secondary">${item.categoria ?? ''} · ${item.ciudad ?? ''}</div>
+              <h3 class="h6 m-0">${nombre}</h3>
+              <div class="small text-secondary">${categoria}${(categoria&&ciudad)?' · ':''}${ciudad}</div>
               <div class="d-flex justify-content-between mt-1">
                 <span class="text-light">${precio}</span>
                 <span class="text-warning">★ ${estrellas}</span>
@@ -176,6 +222,7 @@
       </div>`;
     }
 
+    // -------- Buscar --------
     async function buscar(){
       const maxPrecio = document.getElementById('maxPrecio').value || '';
       const nombre = document.getElementById('nombre').value.trim() || '';
@@ -190,9 +237,11 @@
 
       try{
         const res = await fetch(`/api/explorar/buscar?${params.toString()}`);
+        if(!res.ok) throw new Error('HTTP '+res.status);
         const data = await res.json();
-        grid.innerHTML = (Array.isArray(data)&&data.length) ? data.map(card).join('')
+        const html = (Array.isArray(data)&&data.length) ? data.map(card).join('')
           : '<div class="col"><div class="panel">No hay resultados con esos filtros.</div></div>';
+        grid.innerHTML = html;
       }catch(_){
         grid.innerHTML = '<div class="col"><div class="panel">Error al buscar.</div></div>';
       }

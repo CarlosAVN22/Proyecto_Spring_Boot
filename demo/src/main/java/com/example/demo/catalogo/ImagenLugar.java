@@ -1,5 +1,6 @@
 package com.example.demo.catalogo;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import jakarta.persistence.*;
 
 @Entity
@@ -13,6 +14,7 @@ public class ImagenLugar {
 
     @ManyToOne(fetch = FetchType.LAZY, optional = false)
     @JoinColumn(name = "LUGAR_ID")
+    @JsonIgnore
     private Lugar lugar;
 
     @Column(name = "URL", nullable = false, length = 1000)

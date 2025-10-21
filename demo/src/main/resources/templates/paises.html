@@ -7,74 +7,61 @@
   <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet">
   <style>
     :root{
-      --tint-lavender: #C9B8FF;
-      --tint-apricot:  #FFD8B0;
-      --tint-deep:     #0b0f18;
+      --tint-lavender:#C9B8FF; --tint-apricot:#FFD8B0; --tint-deep:#0b0f18;
       --text:#e9eef6; --muted:#b9c4d2;
-      --pill-bg: rgba(255,255,255,.10);
-      --pill-bg-hover: rgba(255,255,255,.16);
-      --pill-border: rgba(255,255,255,.85);
-      --pill-border-hover: #fff;
-      --radius: 18px;
-      --card-bg: rgba(255,255,255,.14);
-      --card-bg-hover: rgba(255,255,255,.20);
-      --card-border: rgba(255,255,255,.85);
-      --card-border-hover: #fff;
-      --shadow-sm: 0 10px 26px rgba(0,0,0,.22);
-      --shadow-md: 0 24px 46px rgba(0,0,0,.30);
-      --focus: 0 0 0 3px rgba(255,255,255,.28);
+      --pill-bg:rgba(255,255,255,.10); --pill-bg-hover:rgba(255,255,255,.16);
+      --pill-border:rgba(255,255,255,.85); --pill-border-hover:#fff;
+      --radius:18px; --card-bg:rgba(255,255,255,.14); --card-bg-hover:rgba(255,255,255,.20);
+      --card-border:rgba(255,255,255,.85); --card-border-hover:#fff;
+      --shadow-sm:0 10px 26px rgba(0,0,0,.22); --shadow-md:0 24px 46px rgba(0,0,0,.30);
     }
-    html,body{height:100%}
-    body{ color: var(--text); overflow-x: hidden; position: relative; background: var(--tint-deep); }
-    .brand-top{ position: sticky; top: 12px; z-index: 20; display: flex; justify-content: center; pointer-events: none; margin-bottom: 6px;}
-    .brand-top .brand-pill{ position: static; pointer-events: auto; }
-    .brand-pill{
-      display:inline-flex; align-items:center; justify-content:center; height:40px; padding:0 18px; border-radius:9999px;
-      color:#fff; text-decoration:none; font-weight:700; letter-spacing:.2px;
-      border:1.2px solid var(--pill-border); background:var(--pill-bg);
-      -webkit-backdrop-filter: blur(10px) saturate(120%); backdrop-filter: blur(10px) saturate(120%);
-      box-shadow: 0 6px 18px rgba(0,0,0,.25), inset 0 1px 0 rgba(255,255,255,.12);
-      transition: box-shadow .18s ease, background .18s ease, border-color .18s ease;
-    }
-    .brand-pill:hover{ background:var(--pill-bg-hover); border-color:var(--pill-border-hover); box-shadow:0 10px 26px rgba(0,0,0,.32), inset 0 1px 0 rgba(255,255,255,.16); }
-    .page-header{ padding-top: 6px; }
-    .flag-rect{ position: relative; overflow: hidden; }
-    .iso3-badge{
-      position: absolute; left: 12px; bottom: 12px; background: rgba(0,0,0,.45); color: #fff; font-weight: 800;
-      border: 1px solid rgba(255,255,255,.9); border-radius: 999px; padding: .2rem .6rem; font-size: .78rem;
-      -webkit-backdrop-filter: blur(6px); backdrop-filter: blur(6px); box-shadow: 0 2px 8px rgba(0,0,0,.25); z-index: 2;
-    }
-    .bg-color{ position: fixed; inset: -4%;
+    body{ color:var(--text); background:var(--tint-deep); overflow-x:hidden }
+    .bg-color{ position:fixed; inset:-4%;
       background:
         radial-gradient(1100px 720px at 15% -10%, color-mix(in oklab, var(--tint-lavender) 65%, transparent) 0%, transparent 60%),
         radial-gradient(950px 650px at 110% 0%, color-mix(in oklab, var(--tint-apricot) 70%, transparent) 0%, transparent 62%),
-        linear-gradient(180deg, #121827 0%, #0f1422 70%, #0b0f18 100%);
-      filter: blur(28px) saturate(115%); transform: scale(1.04); z-index: -2;
+        linear-gradient(180deg,#121827 0%,#0f1422 70%,#0b0f18 100%);
+      filter:blur(28px) saturate(115%); transform:scale(1.04); z-index:-2;
     }
-    .bg-softveil{ position: fixed; inset: 0;
+    .bg-softveil{ position:fixed; inset:0;
       background:
         radial-gradient(70rem 50rem at 50% 6%, rgba(255,255,255,.08), transparent 72%),
         radial-gradient(60rem 40rem at 0% 100%, rgba(0,0,0,.18), transparent 70%);
-      z-index: -1; pointer-events: none;
+      z-index:-1; pointer-events:none;
     }
-    .page-title{ margin: 0 0 .35rem; font-weight: 900; letter-spacing: .3px; color: #f6f9ff; font-size: clamp(2rem, 5.2vw, 3rem); text-shadow: 0 1px 0 rgba(0,0,0,.6);}
-    .page-sub{ color: var(--muted); font-size: clamp(1rem, 2.2vw, 1.1rem); margin: 0; }
-    .country-card{
-      position: relative; display:block; height:100%; color:inherit; text-decoration:none; border-radius: var(--radius);
-      background: var(--card-bg); -webkit-backdrop-filter: blur(16px) saturate(120%); backdrop-filter: blur(16px) saturate(120%);
-      border: 1.25px solid var(--card-border); box-shadow: var(--shadow-sm); overflow: hidden;
-      transition: transform .18s ease, box-shadow .25s ease, border-color .25s ease, background .25s ease;
+
+    /* Pill reutilizable */
+    .pill{
+      display:inline-flex; align-items:center; justify-content:center;
+      height:40px; padding:0 18px; border-radius:9999px; font-weight:700;
+      letter-spacing:.2px; color:#fff; text-decoration:none;
+      border:1.2px solid var(--pill-border); background:var(--pill-bg);
+      backdrop-filter: blur(10px) saturate(120%); -webkit-backdrop-filter: blur(10px) saturate(120%);
+      box-shadow: 0 6px 18px rgba(0,0,0,.25), inset 0 1px 0 rgba(255,255,255,.12);
+      transition: background .18s ease, border-color .18s ease, transform .16s ease;
     }
-    .country-card:hover{ transform: translateY(-3px); background: var(--card-bg-hover); border-color: var(--card-border-hover); box-shadow: var(--shadow-md); }
-    .flag-rect{ width:100%; aspect-ratio: 16/9; border-radius: 18px 18px 0 0; overflow:hidden; background: rgba(255,255,255,.45); }
-    .flag-img{ width:100%; height:100%; object-fit:cover; display:block; }
-    .country-body{ padding:.9rem 1rem 1rem; text-align:center; }
-    .country-name{ margin:.25rem 0 .2rem; font-weight:800; letter-spacing:.2px; color:#f7faff; }
-    .country-sub{ margin:0 0 .35rem; color: var(--muted); font-size:.92rem; }
-    .country-desc{ color:#d8e0ec; font-size:.95rem; line-height:1.35rem; margin:0; }
-    .country-card .hover-line{ margin:.6rem auto 0; height:1px; width:0; background: rgba(255,255,255,.95); transition: width .3s ease; opacity:.95; }
-    .country-card:hover .hover-line{ width:100%; }
-    @media (min-width: 992px){ .row-center-last > [class*="col-"].center-last-lg{ margin-left:auto !important; margin-right:auto !important; float:none; } }
+    .pill:hover{ background:var(--pill-bg-hover); border-color:var(--pill-border-hover); transform:translateY(-1px) }
+    .bar-top{
+      position:sticky; top:10px; z-index:20;
+      display:flex; align-items:center; justify-content:space-between; padding:0 14px;
+    }
+
+    /* Cards países */
+    .country-card{ display:block; border-radius:var(--radius); background:var(--card-bg);
+      border:1.25px solid var(--card-border); box-shadow:var(--shadow-sm); overflow:hidden;
+      transition: transform .18s, box-shadow .25s, border-color .25s, background .25s;}
+    .country-card:hover{ transform:translateY(-3px); background:var(--card-bg-hover);
+      border-color:var(--card-border-hover); box-shadow:var(--shadow-md);}
+    .flag-rect{ width:100%; aspect-ratio:16/9; background:rgba(255,255,255,.45) }
+    .flag-img{ width:100%; height:100%; object-fit:cover; display:block }
+    .iso3-badge{
+      position:absolute; left:.9rem; bottom:.8rem; background:rgba(0,0,0,.45);
+      color:#fff; font-weight:800; letter-spacing:.5px; padding:.2rem .6rem; font-size:.78rem;
+      border:1px solid rgba(255,255,255,.9); border-radius:999px; backdrop-filter:blur(6px);
+    }
+    .country-body{ padding:.9rem 1rem 1rem; text-align:center }
+    .country-name{ margin:.25rem 0 .2rem; font-weight:800; color:#f7faff }
+    .country-sub{ margin:0 0 .35rem; color:var(--muted); font-size:.92rem }
   </style>
 </head>
 <body>
@@ -82,21 +69,16 @@
   <div class="bg-color"></div>
   <div class="bg-softveil"></div>
 
-  <div class="brand-top">
-    <a class="brand-pill" href="/" aria-label="Inicio Tourify">Tourify</a>
+  <!-- Barra superior: Tourify izq, Administrador der (condicional) -->
+  <div class="bar-top">
+    <a class="pill" href="/" aria-label="Inicio Tourify">Tourify</a>
+    <a id="adminBtn" class="pill" href="/admin" aria-label="Panel de administración" style="display:none">Administrador</a>
   </div>
 
-  <div class="container py-2">
-    <!-- Botón Administrador (oculto por defecto; se muestra si /api/auth/me dice que es ADMIN) -->
-    <div class="d-flex justify-content-end">
-      <button id="adminBtn" class="btn btn-light btn-sm" data-bs-toggle="modal" data-bs-target="#adminLogin" style="display:none">
-        Administrador
-      </button>
-    </div>
-
-    <header class="page-header text-center mt-1">
-      <h1 class="page-title">Elige un país</h1>
-      <p class="page-sub">Selecciona el país para explorar sus lugares.</p>
+  <div class="container py-3">
+    <header class="text-center">
+      <h1 class="fw-bold" style="font-size:clamp(2rem,5.2vw,3rem);text-shadow:0 1px 0 rgba(0,0,0,.6);">Elige un país</h1>
+      <p class="text-secondary">Selecciona el país para explorar sus lugares.</p>
     </header>
 
     <div class="row g-3" th:if="${#lists.isEmpty(paises)}">
@@ -107,120 +89,47 @@
       </div>
     </div>
 
-    <div class="row g-3 row-center-last" th:if="${!#lists.isEmpty(paises)}" id="countriesRow">
+    <div class="row g-3" th:if="${!#lists.isEmpty(paises)}" id="countriesRow">
       <div class="col-12 col-md-6 col-lg-4" th:each="p : ${paises}">
         <a th:href="@{/pais/{id}(id=${p.id})}" class="country-card" th:attr="data-iso3=${p.codigo}">
-          <div class="flag-rect" role="img" th:aria-label="'Bandera de ' + ${p.nombre}">
+          <div class="flag-rect position-relative" role="img" th:aria-label="'Bandera de ' + ${p.nombre}">
             <img class="flag-img" alt="" loading="lazy">
             <span class="iso3-badge" th:text="${p.codigo}">XXX</span>
           </div>
           <div class="country-body">
             <h3 class="country-name h5" th:text="${p.nombre}">Nombre País</h3>
             <p class="country-sub" th:text="${p.codigo}">XXX</p>
-            <p class="country-desc" data-desc>Descripción del país.</p>
-            <div class="hover-line"></div>
           </div>
         </a>
       </div>
     </div>
   </div>
 
-  <!-- Modal Login Admin -->
-  <div class="modal fade" id="adminLogin" tabindex="-1" aria-hidden="true">
-    <div class="modal-dialog">
-      <div class="modal-content" style="border-radius:12px">
-        <div class="modal-header">
-          <h5 class="modal-title">Iniciar sesión (Admin)</h5>
-          <button class="btn-close" data-bs-dismiss="modal" aria-label="Cerrar"></button>
-        </div>
-        <div class="modal-body">
-          <form id="adminLoginForm">
-            <div class="mb-3">
-              <label class="form-label">Correo</label>
-              <input type="email" class="form-control" id="admEmail" required>
-            </div>
-            <div class="mb-3">
-              <label class="form-label">Contraseña</label>
-              <input type="password" class="form-control" id="admPass" required>
-            </div>
-            <button class="btn btn-primary w-100">Entrar</button>
-          </form>
-          <div id="admErr" class="text-danger small mt-2" style="display:none"></div>
-        </div>
-      </div>
-    </div>
-  </div>
-
-  <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
-
   <script>
-    // Mapas y descripciones (banderas)
-    const ISO3_TO_ISO2 = { BLZ:'bz', CRI:'cr', SLV:'sv', GTM:'gt', HND:'hn', NIC:'ni', PAN:'pa' };
-    const DESCS = {
-      BLZ:'Barreras coralinas, cayos y biodiversidad marina.',
-      CRI:'Pura vida: parques, volcanes y ecoturismo.',
-      SLV:'Playas de surf, volcanes y pueblos coloniales.',
-      GTM:'Cultura maya, Lago Atitlán y Antigua colonial.',
-      HND:'Islas de la Bahía, arrecifes y naturaleza tropical.',
-      NIC:'Granada colonial, volcanes y playas del Pacífico.',
-      PAN:'El Canal, selvas biodiversas y rascacielos.'
-    };
-    const flagUrl = iso2 => `https://flagcdn.com/w640/${iso2}.png`;
+    // Mostrar botón Administrador solo si el usuario es admin (email o rol)
+    (async ()=>{
+      try{
+        const res = await fetch('/api/auth/me', { credentials:'same-origin' });
+        const me = await res.json();
+        const isAdminEmail = me?.email === 'admin@tourify.com';
+        const hasAdminRole = Array.isArray(me?.roles) && me.roles.includes('ADMIN');
+        if(me?.authenticated && (isAdminEmail || hasAdminRole)){
+          document.getElementById('adminBtn').style.display = 'inline-flex';
+        }
+      }catch(_){}
+    })();
 
+    // Banderas y descripciones
+    const ISO3_TO_ISO2 = { BLZ:'bz', CRI:'cr', SLV:'sv', GTM:'gt', HND:'hn', NIC:'ni', PAN:'pa' };
+    const flagUrl = iso2 => `https://flagcdn.com/w640/${iso2}.png`;
     document.querySelectorAll('.country-card').forEach(card => {
-      const iso3 = (card.getAttribute('data-iso3') || '').toUpperCase();
+      const iso3 = (card.getAttribute('data-iso3')||'').toUpperCase();
       const iso2 = ISO3_TO_ISO2[iso3];
       const img = card.querySelector('.flag-img');
       const nameEl = card.querySelector('.country-name');
-      const descEl = card.querySelector('[data-desc]');
-      if (iso2 && img) {
+      if (iso2 && img){
         img.src = flagUrl(iso2);
         img.alt = `Bandera de ${nameEl ? nameEl.textContent : iso3}`;
-      }
-      if (descEl) descEl.textContent = DESCS[iso3] || 'Explora sus paisajes, cultura y gastronomía.';
-    });
-
-    // Mostrar botón Admin SOLO si el usuario logueado tiene rol ADMIN
-    (async () => {
-      try {
-        const res = await fetch('/api/auth/me', { credentials: 'same-origin' });
-        const me = await res.json();
-        const btn = document.getElementById('adminBtn');
-        if (me.authenticated && Array.isArray(me.roles) && me.roles.includes('ADMIN')) {
-          btn.style.display = 'inline-block';
-        } else {
-          btn.style.display = 'none';
-        }
-      } catch {
-        document.getElementById('adminBtn').style.display = 'none';
-      }
-    })();
-
-    // Login admin (usa /api/auth/login) y redirige a /admin
-    async function postJson(url, data) {
-      const res = await fetch(url, {
-        method: 'POST',
-        headers: {'Content-Type': 'application/json'},
-        body: JSON.stringify(data),
-        credentials: 'same-origin'
-      });
-      let json = {};
-      try { json = await res.json(); } catch (_){}
-      return { ok: res.ok, json };
-    }
-
-    document.getElementById('adminLoginForm')?.addEventListener('submit', async (e)=>{
-      e.preventDefault();
-      const email = document.getElementById('admEmail').value.trim();
-      const password = document.getElementById('admPass').value;
-      const { ok, json } = await postJson('/api/auth/login', { email, password });
-      const err = document.getElementById('admErr');
-      if (ok) {
-        bootstrap.Modal.getInstance(document.getElementById('adminLogin'))?.hide();
-        location.href = '/admin';
-      } else {
-        err.textContent = json.message || 'Credenciales inválidas';
-        err.style.display = 'block';
       }
     });
   </script>
