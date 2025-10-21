@@ -18,7 +18,8 @@ public class AuthService {
     }
 
     public Usuario register(RegisterRequest r) {
-        if (usuarios.existsByEmail(r.email().toLowerCase())) {
+        final String email = r.email().trim().toLowerCase();   // 👈 trim + lower
+        if (usuarios.existsByEmail(email)) {
             throw new IllegalArgumentException("El email ya está registrado");
         }
         if (usuarios.existsByDui(r.dui())) {
@@ -28,12 +29,11 @@ public class AuthService {
         Usuario u = new Usuario();
         u.setNombre(r.nombre());
         u.setApellido(r.apellido());
-        u.setEmail(r.email().toLowerCase());
+        u.setEmail(email);
         u.setContrasenaHash(encoder.encode(r.password()));
         u.setDui(r.dui());
         u.setTelefono(r.telefono());
 
-        // Asegura que el rol 'USUARIO' exista y asígnalo
         Rol rolUsuario = roles.findByCodigo("USUARIO")
                 .orElseThrow(() -> new IllegalStateException("Falta rol 'USUARIO' en tabla ROL"));
         u.getRoles().add(rolUsuario);
@@ -42,7 +42,8 @@ public class AuthService {
     }
 
     public Usuario login(LoginRequest r) {
-        Usuario u = usuarios.findByEmail(r.email().toLowerCase())
+        final String email = r.email().trim().toLowerCase();   // 👈 trim + lower
+        Usuario u = usuarios.findByEmail(email)
                 .orElseThrow(() -> new IllegalArgumentException("Usuario o contraseña inválidos"));
         if (!encoder.matches(r.password(), u.getContrasenaHash())) {
             throw new IllegalArgumentException("Usuario o contraseña inválidos");

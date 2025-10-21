@@ -1,0 +1,265 @@
+<!doctype html>
+<html lang="es" xmlns:th="http://www.thymeleaf.org">
+<head>
+  <meta charset="utf-8">
+  <title>Panel de Administración — Tourify</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <base href="/" /> <!-- fuerza rutas absolutas -->
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet">
+
+  <style>
+    :root{
+      --bg:#0b0f18; --bg2:#0f1422; --card:rgba(255,255,255,.06); --border:rgba(255,255,255,.14);
+      --text:#eef1f4; --muted:#9aa3ad; --accent:#5ec1ff; --radius:16px;
+    }
+    body{
+      color:var(--text);
+      background:
+        radial-gradient(1200px 800px at 10% -10%, rgba(94,193,255,.08), transparent 60%),
+        radial-gradient(1000px 600px at 110% 0%, rgba(140,122,255,.08), transparent 60%),
+        linear-gradient(180deg, var(--bg), var(--bg2));
+      min-height:100vh;
+    }
+    .navglass{
+      backdrop-filter: blur(10px);
+      -webkit-backdrop-filter: blur(10px);
+      background: rgba(255,255,255,.06);
+      border-bottom:1px solid var(--border);
+    }
+    .card-soft{
+      border:1px solid var(--border);
+      background:var(--card);
+      border-radius:var(--radius);
+      backdrop-filter: blur(8px);
+      -webkit-backdrop-filter: blur(8px);
+      box-shadow: 0 14px 34px rgba(0,0,0,.35), inset 0 1px 0 rgba(255,255,255,.05);
+    }
+    .btn-outline-light{border-color:rgba(255,255,255,.55)}
+    label{color:var(--muted); font-weight:600}
+    .form-control, .form-select{
+      color:var(--text); background:rgba(255,255,255,.06);
+      border:1px solid rgba(255,255,255,.14);
+    }
+    .form-control::placeholder{ color:#cbd5e1; opacity:.9; }
+    .form-control:focus, .form-select:focus{
+      border-color: var(--accent);
+      box-shadow: 0 0 0 .2rem rgba(94,193,255,.25);
+      background: rgba(255,255,255,.08);
+      color:var(--text);
+    }
+    .help{ color: var(--muted); font-size:.9rem }
+  </style>
+</head>
+<body>
+
+  <!-- Barra superior -->
+  <nav class="navglass navbar navbar-expand-lg navbar-dark">
+    <div class="container">
+      <a class="navbar-brand fw-bold" href="/paises">Tourify — Admin</a>
+      <div class="ms-auto d-flex align-items-center gap-2">
+        <span id="whoami" class="small text-secondary"></span>
+        <form action="/api/auth/logout" method="post" class="m-0">
+          <button class="btn btn-outline-light btn-sm" type="submit">Cerrar sesión</button>
+        </form>
+      </div>
+    </div>
+  </nav>
+
+  <main class="container py-4">
+    <div class="row g-3 mb-3">
+      <div class="col-12">
+        <div class="card-soft p-3">
+          <h1 class="h4 mb-1">Panel de administración</h1>
+          <p class="help mb-0">Aquí puedes registrar nuevos lugares (solo país, sin ciudad).</p>
+        </div>
+      </div>
+    </div>
+
+    <!-- FORMULARIO NUEVO LUGAR -->
+    <div class="row g-3">
+      <div class="col-12 col-lg-8">
+        <div class="card-soft p-3">
+          <h2 class="h5 mb-3">Nuevo lugar</h2>
+          <form id="formLugar" class="row g-3">
+
+            <div class="col-md-8">
+              <label class="form-label">Nombre</label>
+              <input class="form-control" name="nombre" placeholder="Ej: Hotel Colonial" required>
+            </div>
+
+            <div class="col-md-4">
+              <label class="form-label">Categoría (código)</label>
+              <select class="form-select" name="categoriaCodigo" required>
+                <option value="">-- Selecciona --</option>
+                <option value="HOTEL">HOTEL</option>
+                <option value="AIRBNB">AIRBNB</option>
+                <option value="PLAYA">PLAYA</option>
+                <option value="PARQUE">PARQUE</option>
+                <option value="RESTAURANTE">RESTAURANTE</option>
+              </select>
+            </div>
+
+            <div class="col-md-6">
+              <label class="form-label">País</label>
+              <select class="form-select" name="paisId" id="paisId" required>
+                <option value="">Cargando países...</option>
+              </select>
+              <div class="help">Datos obtenidos de <code>/api/paises</code>.</div>
+            </div>
+
+            <div class="col-md-6">
+              <label class="form-label">Precio (USD)</label>
+              <input type="number" step="0.01" min="0" class="form-control" name="precio" placeholder="0.00">
+            </div>
+
+            <div class="col-12">
+              <label class="form-label">Dirección</label>
+              <input class="form-control" name="direccion" placeholder="Calle, avenida...">
+            </div>
+
+            <div class="col-12">
+              <label class="form-label">Descripción</label>
+              <textarea class="form-control" rows="3" name="descripcion" placeholder="Texto descriptivo..."></textarea>
+            </div>
+
+            <div class="col-12">
+              <label class="form-label">URL de imagen principal</label>
+              <input class="form-control" name="imagenUrl" placeholder="https://...">
+            </div>
+
+            <div class="col-12 d-flex gap-2">
+              <button class="btn btn-primary" type="submit">Guardar</button>
+              <button class="btn btn-outline-light" type="button" id="btnPreview">Previsualizar</button>
+            </div>
+
+            <div id="msg" class="alert py-2 px-3 mt-2 d-none"></div>
+          </form>
+        </div>
+      </div>
+
+      <!-- PREVISUALIZACIÓN -->
+      <div class="col-12 col-lg-4">
+        <div class="card-soft p-3">
+          <h2 class="h6 mb-2">Vista previa</h2>
+          <div id="preview" class="border rounded p-2" style="border-color:rgba(255,255,255,.14)!important">
+            <div class="ratio ratio-16x9 mb-2 bg-dark-subtle" style="background:#111">
+              <img id="prevImg" alt="imagen" style="object-fit:cover; width:100%; height:100%; display:none;">
+            </div>
+            <div class="small text-secondary" id="prevCategoria">—</div>
+            <h3 class="h6 mb-1" id="prevNombre">—</h3>
+            <div class="d-flex justify-content-between">
+              <span id="prevDireccion" class="small text-secondary">—</span>
+              <strong id="prevPrecio">$0.00</strong>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </main>
+
+  <!-- SCRIPT -->
+  <script>
+    // Mostrar usuario autenticado
+    (async () => {
+      try {
+        const res = await fetch('/api/auth/me', { credentials: 'same-origin' });
+        const me = await res.json();
+        const who = document.getElementById('whoami');
+        if (me.authenticated) {
+          const roles = Array.isArray(me.roles) ? me.roles.join(',') : '';
+          who.textContent = `${me.email} · Roles: ${roles}`;
+        } else {
+          who.textContent = 'No autenticado';
+        }
+      } catch (_) {}
+    })();
+
+    // Cargar países
+    async function loadPaises() {
+      const sel = document.getElementById('paisId');
+      try {
+        const res = await fetch('/api/paises', { credentials: 'same-origin' });
+        const data = await res.json();
+        sel.innerHTML = '<option value="">-- Selecciona un país --</option>';
+        (data || []).forEach(p => {
+          const opt = document.createElement('option');
+          opt.value = p.id;
+          opt.textContent = `${p.nombre} (${p.codigoPais || p.codigo || ''})`;
+          sel.appendChild(opt);
+        });
+      } catch (e) {
+        sel.innerHTML = '<option value="">(No se pudo cargar)</option>';
+      }
+    }
+
+    // Previsualización
+    function updatePreview() {
+      const f = document.getElementById('formLugar');
+      const nombre = f.nombre.value.trim() || '—';
+      const cat = f.categoriaCodigo.value || '—';
+      const direccion = f.direccion.value.trim() || '—';
+      const precio = f.precio.value ? Number(f.precio.value).toFixed(2) : '0.00';
+      const imgUrl = f.imagenUrl.value.trim();
+
+      document.getElementById('prevNombre').textContent = nombre;
+      document.getElementById('prevCategoria').textContent = cat;
+      document.getElementById('prevDireccion').textContent = direccion;
+      document.getElementById('prevPrecio').textContent = `$${precio}`;
+
+      const img = document.getElementById('prevImg');
+      if (imgUrl) { img.src = imgUrl; img.style.display = 'block'; }
+      else { img.removeAttribute('src'); img.style.display = 'none'; }
+    }
+
+    document.getElementById('btnPreview')?.addEventListener('click', updatePreview);
+    document.getElementById('formLugar')?.addEventListener('input', (e)=>{
+      if(['nombre','categoriaCodigo','direccion','precio','imagenUrl'].includes(e.target.name)) updatePreview();
+    });
+
+    // Guardar lugar
+    document.getElementById('formLugar')?.addEventListener('submit', async (e) => {
+      e.preventDefault();
+      const f = e.target;
+      const payload = {
+        nombre: f.nombre.value.trim() || null,
+        categoriaCodigo: f.categoriaCodigo.value ? f.categoriaCodigo.value.toUpperCase() : null,
+        paisId: f.paisId.value ? Number(f.paisId.value) : null,
+        ciudadId: null, // Eliminada ciudad
+        direccion: f.direccion.value.trim() || null,
+        precio: f.precio.value ? Number(f.precio.value) : null,
+        imagenUrl: f.imagenUrl.value.trim() || null
+      };
+
+      const msg = document.getElementById('msg');
+      msg.classList.remove('d-none','alert-danger','alert-info','alert-success');
+
+      try {
+        const res = await fetch('/api/admin/lugares', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          credentials: 'same-origin',
+          body: JSON.stringify(payload)
+        });
+
+        const data = await res.json();
+        if (res.ok && data.ok) {
+          msg.classList.add('alert-success');
+          msg.textContent = `✔ ${data.message || 'Lugar creado correctamente'} (ID ${data.id})`;
+          f.reset();
+          updatePreview();
+        } else {
+          msg.classList.add('alert-danger');
+          msg.textContent = data.message || 'Error al guardar el lugar';
+        }
+      } catch (err) {
+        msg.classList.add('alert-danger');
+        msg.textContent = 'Error de red o servidor (500)';
+      }
+    });
+
+    // Inicializar
+    loadPaises();
+    updatePreview();
+  </script>
+</body>
+</html>

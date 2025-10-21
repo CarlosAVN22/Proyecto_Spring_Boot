@@ -7,8 +7,7 @@ import org.springframework.data.repository.query.Param;
 import java.math.BigDecimal;
 import java.util.List;
 
-public interface LugarResumenRepository extends Repository<Pais, Long> {
-    List<Pais> findAll(); // dummy
+public interface LugarResumenRepository extends Repository<Lugar, Long> {
 
     @Query(value = """
             SELECT

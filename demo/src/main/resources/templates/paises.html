@@ -7,212 +7,94 @@
   <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet">
   <style>
     :root{
-      /* ===== Paleta fondo (evita azul/blanco/rojo/celeste) ===== */
-      --tint-lavender: #C9B8FF;   /* lavanda suave (llamativo sin chillar) */
-      --tint-apricot:  #FFD8B0;   /* albaricoque cálido */
-      --tint-deep:     #0b0f18;   /* base oscura para contraste general */
-
-      /* Texto UI */
-      --text:#e9eef6;
-      --muted:#b9c4d2;
-
-      /* Botón/Glass (mismo estilo que login/register) */
+      --tint-lavender: #C9B8FF;
+      --tint-apricot:  #FFD8B0;
+      --tint-deep:     #0b0f18;
+      --text:#e9eef6; --muted:#b9c4d2;
       --pill-bg: rgba(255,255,255,.10);
       --pill-bg-hover: rgba(255,255,255,.16);
       --pill-border: rgba(255,255,255,.85);
       --pill-border-hover: #fff;
-
-      /* Cards glass con borde blanco */
       --radius: 18px;
       --card-bg: rgba(255,255,255,.14);
       --card-bg-hover: rgba(255,255,255,.20);
       --card-border: rgba(255,255,255,.85);
       --card-border-hover: #fff;
-
       --shadow-sm: 0 10px 26px rgba(0,0,0,.22);
       --shadow-md: 0 24px 46px rgba(0,0,0,.30);
       --focus: 0 0 0 3px rgba(255,255,255,.28);
     }
-
     html,body{height:100%}
-    body{
-      color: var(--text);
-      overflow-x: hidden; position: relative;
-      background: var(--tint-deep); /* fallback */
+    body{ color: var(--text); overflow-x: hidden; position: relative; background: var(--tint-deep); }
+    .brand-top{ position: sticky; top: 12px; z-index: 20; display: flex; justify-content: center; pointer-events: none; margin-bottom: 6px;}
+    .brand-top .brand-pill{ position: static; pointer-events: auto; }
+    .brand-pill{
+      display:inline-flex; align-items:center; justify-content:center; height:40px; padding:0 18px; border-radius:9999px;
+      color:#fff; text-decoration:none; font-weight:700; letter-spacing:.2px;
+      border:1.2px solid var(--pill-border); background:var(--pill-bg);
+      -webkit-backdrop-filter: blur(10px) saturate(120%); backdrop-filter: blur(10px) saturate(120%);
+      box-shadow: 0 6px 18px rgba(0,0,0,.25), inset 0 1px 0 rgba(255,255,255,.12);
+      transition: box-shadow .18s ease, background .18s ease, border-color .18s ease;
     }
-
-    /* --- TOP: Tourify fijo y centrado --- */
-.brand-top{
-  position: sticky;          /* se queda “pegado” al top durante el scroll */
-  top: 12px;
-  z-index: 20;
-  display: flex;
-  justify-content: center;
-  pointer-events: none;      /* para que solo el pill reciba el click */
-}
-.brand-top .brand-pill{
-  position: static;          /* ya no fixed */
-  pointer-events: auto;
-}
-
-/* pill sin “brinco” vertical en hover */
-.brand-pill{
-  display: inline-flex; align-items: center; justify-content: center;
-  height: 40px; padding: 0 18px;
-  border-radius: 9999px;
-  color: #fff; text-decoration: none; font-weight: 700; letter-spacing:.2px;
-  border: 1.2px solid var(--pill-border);
-  background: var(--pill-bg);
-  -webkit-backdrop-filter: blur(10px) saturate(120%);
-  backdrop-filter: blur(10px) saturate(120%);
-  box-shadow: 0 6px 18px rgba(0,0,0,.25), inset 0 1px 0 rgba(255,255,255,.12);
-  transition: box-shadow .18s ease, background .18s ease, border-color .18s ease;
-}
-.brand-pill:hover{
-  background: var(--pill-bg-hover);
-  border-color: var(--pill-border-hover);
-  box-shadow: 0 10px 26px rgba(0,0,0,.32), inset 0 1px 0 rgba(255,255,255,.16);
-}
-
-/* --- Espacio para que el sticky no tape el título --- */
-.page-header{ padding-top: 72px; }
-
-/* --- BLZ: vuelve a la bandera, esquina inferior-izquierda --- */
-.flag-rect{ position: relative; overflow: hidden; } /* ya lo tenías, lo refuerzo */
-.iso3-badge{
-  position: absolute;
-  left: 12px;                /* esquina izquierda */
-  bottom: 12px;              /* esquina inferior */
-  background: rgba(0,0,0,.45);
-  color: #fff; font-weight: 800; letter-spacing: .5px;
-  border: 1px solid rgba(255,255,255,.9);
-  border-radius: 999px; padding: .2rem .6rem; font-size: .78rem;
-  -webkit-backdrop-filter: blur(6px); backdrop-filter: blur(6px);
-  box-shadow: 0 2px 8px rgba(0,0,0,.25);
-  z-index: 2;
-}
-
-    /* ===== Fondo: colorido, opaco y con blur (sin volverse gris) ===== */
-    .bg-color{
-      position: fixed; inset: -4%;
+    .brand-pill:hover{ background:var(--pill-bg-hover); border-color:var(--pill-border-hover); box-shadow:0 10px 26px rgba(0,0,0,.32), inset 0 1px 0 rgba(255,255,255,.16); }
+    .page-header{ padding-top: 6px; }
+    .flag-rect{ position: relative; overflow: hidden; }
+    .iso3-badge{
+      position: absolute; left: 12px; bottom: 12px; background: rgba(0,0,0,.45); color: #fff; font-weight: 800;
+      border: 1px solid rgba(255,255,255,.9); border-radius: 999px; padding: .2rem .6rem; font-size: .78rem;
+      -webkit-backdrop-filter: blur(6px); backdrop-filter: blur(6px); box-shadow: 0 2px 8px rgba(0,0,0,.25); z-index: 2;
+    }
+    .bg-color{ position: fixed; inset: -4%;
       background:
         radial-gradient(1100px 720px at 15% -10%, color-mix(in oklab, var(--tint-lavender) 65%, transparent) 0%, transparent 60%),
         radial-gradient(950px 650px at 110% 0%, color-mix(in oklab, var(--tint-apricot) 70%, transparent) 0%, transparent 62%),
         linear-gradient(180deg, #121827 0%, #0f1422 70%, #0b0f18 100%);
-      filter: blur(28px) saturate(115%);
-      transform: scale(1.04);
-      z-index: -2;
+      filter: blur(28px) saturate(115%); transform: scale(1.04); z-index: -2;
     }
-    .bg-softveil{
-      position: fixed; inset: 0;
+    .bg-softveil{ position: fixed; inset: 0;
       background:
         radial-gradient(70rem 50rem at 50% 6%, rgba(255,255,255,.08), transparent 72%),
         radial-gradient(60rem 40rem at 0% 100%, rgba(0,0,0,.18), transparent 70%);
-      z-index: -1;
-      pointer-events: none;
+      z-index: -1; pointer-events: none;
     }
-
-    /* ===== Botón “Tourify” (pill) — SOLO botón, sin barra gris ===== */
-    .brand-pill{
-      position: fixed; top: 14px; left: 50%; transform: translateX(-50%);
-      display: inline-flex; align-items: center; justify-content: center;
-      height: 40px; padding: 0 18px;
-      border-radius: 9999px;
-      color: #fff; text-decoration: none; font-weight: 700; letter-spacing:.2px;
-      border: 1.2px solid var(--pill-border);
-      background: var(--pill-bg);
-      -webkit-backdrop-filter: blur(10px) saturate(120%);
-      backdrop-filter: blur(10px) saturate(120%);
-      box-shadow: 0 6px 18px rgba(0,0,0,.25), inset 0 1px 0 rgba(255,255,255,.12);
-      transition: transform .16s ease, box-shadow .18s ease, background .18s ease, border-color .18s ease;
-      z-index: 10;
-    }
-    .brand-pill:hover{
-      transform: translateX(-50%) translateY(-1px);
-      background: var(--pill-bg-hover);
-      border-color: var(--pill-border-hover);
-      box-shadow: 0 10px 26px rgba(0,0,0,.32), inset 0 1px 0 rgba(255,255,255,.16);
-    }
-    .brand-pill:active{ transform: translateX(-50%) translateY(0); }
-
-    /* ===== Títulos ===== */
-    .page-header{ text-align: center; padding: 70px 0 12px; }
-    .page-title{
-      margin: 0 0 .35rem; font-weight: 900; letter-spacing: .3px;
-      color: #f6f9ff; font-size: clamp(2rem, 5.2vw, 3rem);
-      text-shadow: 0 1px 0 rgba(0,0,0,.6);
-    }
+    .page-title{ margin: 0 0 .35rem; font-weight: 900; letter-spacing: .3px; color: #f6f9ff; font-size: clamp(2rem, 5.2vw, 3rem); text-shadow: 0 1px 0 rgba(0,0,0,.6);}
     .page-sub{ color: var(--muted); font-size: clamp(1rem, 2.2vw, 1.1rem); margin: 0; }
-
-    /* ===== Cards glass con contorno blanco ===== */
     .country-card{
-      position: relative; display:block; height:100%; color:inherit; text-decoration:none;
-      border-radius: var(--radius);
-      background: var(--card-bg);
-      -webkit-backdrop-filter: blur(16px) saturate(120%);
-      backdrop-filter: blur(16px) saturate(120%);
-      border: 1.25px solid var(--card-border);
-      box-shadow: var(--shadow-sm);
-      overflow: hidden;
+      position: relative; display:block; height:100%; color:inherit; text-decoration:none; border-radius: var(--radius);
+      background: var(--card-bg); -webkit-backdrop-filter: blur(16px) saturate(120%); backdrop-filter: blur(16px) saturate(120%);
+      border: 1.25px solid var(--card-border); box-shadow: var(--shadow-sm); overflow: hidden;
       transition: transform .18s ease, box-shadow .25s ease, border-color .25s ease, background .25s ease;
     }
-    .country-card:hover{
-      transform: translateY(-3px);
-      background: var(--card-bg-hover);
-      border-color: var(--card-border-hover);
-      box-shadow: var(--shadow-md);
-    }
-    .country-card:focus-visible{ outline: none; box-shadow: var(--focus); }
-
-    .flag-rect{
-      width:100%; aspect-ratio: 16/9; border-radius: 18px 18px 0 0; overflow:hidden;
-      background: rgba(255,255,255,.45);
-    }
+    .country-card:hover{ transform: translateY(-3px); background: var(--card-bg-hover); border-color: var(--card-border-hover); box-shadow: var(--shadow-md); }
+    .flag-rect{ width:100%; aspect-ratio: 16/9; border-radius: 18px 18px 0 0; overflow:hidden; background: rgba(255,255,255,.45); }
     .flag-img{ width:100%; height:100%; object-fit:cover; display:block; }
-
-    .iso3-badge{
-      position:absolute; left:.9rem; bottom:.8rem;
-      background: rgba(0,0,0,.45);
-      color:#fff; font-weight:800; letter-spacing:.5px;
-      border:1px solid rgba(255,255,255,.9);
-      border-radius:999px; padding:.2rem .6rem; font-size:.78rem;
-      -webkit-backdrop-filter: blur(6px); backdrop-filter: blur(6px);
-      box-shadow: 0 2px 8px rgba(0,0,0,.25);
-    }
-
     .country-body{ padding:.9rem 1rem 1rem; text-align:center; }
     .country-name{ margin:.25rem 0 .2rem; font-weight:800; letter-spacing:.2px; color:#f7faff; }
     .country-sub{ margin:0 0 .35rem; color: var(--muted); font-size:.92rem; }
     .country-desc{ color:#d8e0ec; font-size:.95rem; line-height:1.35rem; margin:0; }
-
-    .country-card .hover-line{
-      margin:.6rem auto 0; height:1px; width:0;
-      background: rgba(255,255,255,.95);
-      transition: width .3s ease; opacity:.95;
-    }
+    .country-card .hover-line{ margin:.6rem auto 0; height:1px; width:0; background: rgba(255,255,255,.95); transition: width .3s ease; opacity:.95; }
     .country-card:hover .hover-line{ width:100%; }
-
-    @media (min-width: 992px){
-      .row-center-last > [class*="col-"].center-last-lg{
-        margin-left:auto !important; margin-right:auto !important; float:none;
-      }
-    }
+    @media (min-width: 992px){ .row-center-last > [class*="col-"].center-last-lg{ margin-left:auto !important; margin-right:auto !important; float:none; } }
   </style>
 </head>
 <body>
 
-  <!-- Fondo colorido con blur -->
   <div class="bg-color"></div>
   <div class="bg-softveil"></div>
 
- <!-- Antes: <a class="brand-pill" href="/">Tourify</a> -->
-<div class="brand-top">
-  <a class="brand-pill" href="/" aria-label="Inicio Tourify">Tourify</a>
-</div>
+  <div class="brand-top">
+    <a class="brand-pill" href="/" aria-label="Inicio Tourify">Tourify</a>
+  </div>
 
+  <div class="container py-2">
+    <!-- Botón Administrador (oculto por defecto; se muestra si /api/auth/me dice que es ADMIN) -->
+    <div class="d-flex justify-content-end">
+      <button id="adminBtn" class="btn btn-light btn-sm" data-bs-toggle="modal" data-bs-target="#adminLogin" style="display:none">
+        Administrador
+      </button>
+    </div>
 
-  <div class="container py-3">
-    <header class="page-header">
+    <header class="page-header text-center mt-1">
       <h1 class="page-title">Elige un país</h1>
       <p class="page-sub">Selecciona el país para explorar sus lugares.</p>
     </header>
@@ -243,8 +125,36 @@
     </div>
   </div>
 
+  <!-- Modal Login Admin -->
+  <div class="modal fade" id="adminLogin" tabindex="-1" aria-hidden="true">
+    <div class="modal-dialog">
+      <div class="modal-content" style="border-radius:12px">
+        <div class="modal-header">
+          <h5 class="modal-title">Iniciar sesión (Admin)</h5>
+          <button class="btn-close" data-bs-dismiss="modal" aria-label="Cerrar"></button>
+        </div>
+        <div class="modal-body">
+          <form id="adminLoginForm">
+            <div class="mb-3">
+              <label class="form-label">Correo</label>
+              <input type="email" class="form-control" id="admEmail" required>
+            </div>
+            <div class="mb-3">
+              <label class="form-label">Contraseña</label>
+              <input type="password" class="form-control" id="admPass" required>
+            </div>
+            <button class="btn btn-primary w-100">Entrar</button>
+          </form>
+          <div id="admErr" class="text-danger small mt-2" style="display:none"></div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
+
   <script>
-    /* ISO3 -> ISO2 + descripciones */
+    // Mapas y descripciones (banderas)
     const ISO3_TO_ISO2 = { BLZ:'bz', CRI:'cr', SLV:'sv', GTM:'gt', HND:'hn', NIC:'ni', PAN:'pa' };
     const DESCS = {
       BLZ:'Barreras coralinas, cayos y biodiversidad marina.',
@@ -263,22 +173,56 @@
       const img = card.querySelector('.flag-img');
       const nameEl = card.querySelector('.country-name');
       const descEl = card.querySelector('[data-desc]');
-
       if (iso2 && img) {
         img.src = flagUrl(iso2);
         img.alt = `Bandera de ${nameEl ? nameEl.textContent : iso3}`;
       }
-      descEl.textContent = DESCS[iso3] || 'Explora sus paisajes, cultura y gastronomía.';
+      if (descEl) descEl.textContent = DESCS[iso3] || 'Explora sus paisajes, cultura y gastronomía.';
     });
 
-    /* Centrar última tarjeta si sobra 1 en layout de 3 por fila (≥lg) */
-    (function centerLast(){
-      const row = document.getElementById('countriesRow');
-      const cols = row ? Array.from(row.querySelectorAll('[class*="col-"]')) : [];
-      if (!cols.length) return;
-      cols.forEach(c => c.classList.remove('center-last-lg'));
-      if (cols.length % 3 === 1) cols[cols.length - 1].classList.add('center-last-lg');
+    // Mostrar botón Admin SOLO si el usuario logueado tiene rol ADMIN
+    (async () => {
+      try {
+        const res = await fetch('/api/auth/me', { credentials: 'same-origin' });
+        const me = await res.json();
+        const btn = document.getElementById('adminBtn');
+        if (me.authenticated && Array.isArray(me.roles) && me.roles.includes('ADMIN')) {
+          btn.style.display = 'inline-block';
+        } else {
+          btn.style.display = 'none';
+        }
+      } catch {
+        document.getElementById('adminBtn').style.display = 'none';
+      }
     })();
+
+    // Login admin (usa /api/auth/login) y redirige a /admin
+    async function postJson(url, data) {
+      const res = await fetch(url, {
+        method: 'POST',
+        headers: {'Content-Type': 'application/json'},
+        body: JSON.stringify(data),
+        credentials: 'same-origin'
+      });
+      let json = {};
+      try { json = await res.json(); } catch (_){}
+      return { ok: res.ok, json };
+    }
+
+    document.getElementById('adminLoginForm')?.addEventListener('submit', async (e)=>{
+      e.preventDefault();
+      const email = document.getElementById('admEmail').value.trim();
+      const password = document.getElementById('admPass').value;
+      const { ok, json } = await postJson('/api/auth/login', { email, password });
+      const err = document.getElementById('admErr');
+      if (ok) {
+        bootstrap.Modal.getInstance(document.getElementById('adminLogin'))?.hide();
+        location.href = '/admin';
+      } else {
+        err.textContent = json.message || 'Credenciales inválidas';
+        err.style.display = 'block';
+      }
+    });
   </script>
 </body>
 </html>
