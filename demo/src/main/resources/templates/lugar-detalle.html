@@ -2,60 +2,124 @@
 <html lang="es" xmlns:th="http://www.thymeleaf.org">
 <head>
   <meta charset="utf-8"/>
-  <title th:text="${lugar.lugar}">Detalle</title>
+  <title th:text="${vm.titulo} + ' — Detalle'">Detalle</title>
   <meta name="viewport" content="width=device-width, initial-scale=1">
   <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet">
+
   <style>
-    :root{--bg:#0b0c0f; --bg2:#11131a; --card:rgba(255,255,255,.06); --border:rgba(255,255,255,.14); --text:#eef1f4; --muted:#9aa3ad}
+    :root{
+      --bg:#0b0f18; --bg2:#0f1422; --text:#eef1f4; --muted:#aab3bf;
+      --card:rgba(255,255,255,.06); --border:rgba(255,255,255,.14);
+      --accent:#5ec1ff; --radius:18px;
+    }
     body{background:linear-gradient(180deg,var(--bg),var(--bg2)); color:var(--text)}
-    .panel{border:1px solid var(--border); background:var(--card); border-radius:16px; overflow:hidden}
-    .gal{display:grid; grid-template-columns:2fr 1fr; gap:8px}
-    .gal img{width:100%; height:100%; object-fit:cover; border-radius:8px}
-    .gal .big{grid-row: span 2; aspect-ratio:16/10}
-    @media (max-width: 768px){ .gal{grid-template-columns:1fr} .gal .big{aspect-ratio:16/9}}
+    a{color:inherit}
+    .navglass{background:rgba(255,255,255,.05); border-bottom:1px solid var(--border); backdrop-filter:blur(10px)}
+    .chip{background:rgba(255,255,255,.08); border:1px solid var(--border); border-radius:999px; padding:.25rem .6rem; font-size:.85rem; color:var(--muted)}
+    .card-soft{border:1px solid var(--border); background:var(--card); border-radius:var(--radius)}
+    .hero{position:relative; border-radius:var(--radius); overflow:hidden; border:1px solid var(--border)}
+    .hero .media{aspect-ratio:16/9; background:#111}
+    .hero img{width:100%; height:100%; object-fit:cover}
+    .hero .overlay{position:absolute; inset:0; background:linear-gradient(0deg, rgba(0,0,0,.55), transparent 55%);}
+    .hero .title{position:absolute; left:0; right:0; bottom:0; padding:1rem 1.25rem}
+    .thumbs img{width:100%; aspect-ratio:16/9; object-fit:cover; border-radius:12px; border:1px solid var(--border); cursor:pointer}
+    .thumbs img.active{outline:2px solid var(--accent)}
+    .list-clean{list-style:none; padding-left:0; margin:0}
+    .divider{height:1px; background:var(--border); margin:1rem 0}
+
+    /* rating stars visual */
+    .stars{position:relative; display:inline-block; font-size:0; width:110px; height:20px; vertical-align:middle}
+    .stars::before{content:"★★★★★"; letter-spacing:2px; font-size:20px; color:#7a8594}
+    .stars .fill{position:absolute; left:0; top:0; height:100%; overflow:hidden; white-space:nowrap}
+    .stars .fill::before{content:"★★★★★"; letter-spacing:2px; font-size:20px; color:#ffc107}
+    .price-badge{background:rgba(0,0,0,.4); border:1px solid var(--border); border-radius:999px; padding:.2rem .6rem}
   </style>
 </head>
 <body>
-  <div class="container py-4">
-    <a href="javascript:history.back()" class="text-secondary">&larr; Regresar</a>
-
-    <header class="my-3">
-      <h1 class="h3" th:text="${lugar.lugar}">Nombre</h1>
-      <div class="text-secondary">
-        <span th:text="${lugar.categoria}">Categoría</span> ·
-        <span th:text="${lugar.ciudad}">Ciudad</span> ·
-        <span th:text="${lugar.pais}">País</span>
+  <!-- Barra superior -->
+  <nav class="navglass">
+    <div class="container py-2 d-flex align-items-center justify-content-between">
+      <div class="d-flex align-items-center gap-2">
+        <a href="/explorar/index" class="chip">Explorar</a>
+        <span class="chip" th:text="${vm.categoria}">Categoría</span>
+        <span class="chip" th:text="${vm.ciudad}">Ciudad</span>
+        <span class="chip" th:text="${vm.pais}">País</span>
       </div>
-    </header>
+      <a href="javascript:history.back()" class="chip">← Regresar</a>
+    </div>
+  </nav>
 
-    <!-- Galería -->
-    <section class="panel p-3">
-      <div class="gal" th:if="${imagenes != null and !imagenes.isEmpty()}">
-        <img class="big" th:src="${imagenes[0]}" alt="">
-        <img th:each="u,iter : ${imagenes}" th:if="${iter.index > 0 and iter.index < 4}" th:src="${u}" alt="">
+  <main class="container py-4">
+    <!-- HERO -->
+    <section class="hero mb-3">
+      <div class="media">
+        <img id="mainImage"
+             th:src="${imagenPrincipal != null} ? ${imagenPrincipal} : 'https://via.placeholder.com/1600x900?text=Sin+imagen'"
+             alt="Imagen principal">
       </div>
-      <div class="text-secondary" th:if="${imagenes == null or imagenes.isEmpty()}">Sin imágenes.</div>
+      <div class="overlay"></div>
+      <div class="title">
+        <h1 class="h3 mb-1" th:text="${vm.titulo}">Nombre del lugar</h1>
+        <div class="d-flex align-items-center gap-3">
+          <div class="stars">
+            <div class="fill" th:style="'width:' + ${vm.starPercent} + '%;'"></div>
+          </div>
+          <span class="small text-warning" th:text="${vm.ratingText} + ' ★'">0.0 ★</span>
+          <span class="price-badge" th:text="${vm.precio}">—</span>
+        </div>
+      </div>
     </section>
 
-    <!-- Datos -->
-    <section class="panel p-3 mt-3">
-      <div class="row g-3">
-        <div class="col-md-6">
-          <div><strong>Dirección:</strong> <span th:text="${lugar.direccion}">—</span></div>
-          <div><strong>Precio:</strong> $<span th:text="${lugar.precio}">—</span></div>
+    <div class="row g-3">
+      <div class="col-12 col-lg-8">
+        <!-- Thumbnails -->
+        <div class="thumbs row g-2" th:if="${imagenes != null and !imagenes.isEmpty()}">
+          <div class="col-6 col-md-4 col-lg-3" th:each="u,iter : ${imagenes}">
+            <img th:src="${u}" th:classappend="${iter.index == 0} ? ' active' : ''" alt="miniatura">
+          </div>
         </div>
-        <div class="col-md-6">
-          <div><strong>Promedio estrellas:</strong> <span th:text="${lugar.promedioEstrellas}">0</span> ★</div>
-          <div><strong>Código categoría:</strong> <span th:text="${lugar.categoriaCodigo}">—</span></div>
+
+        <div class="card-soft p-3 mt-3">
+          <h2 class="h6 text-secondary mb-2">Información</h2>
+          <ul class="list-clean">
+            <li class="mb-1"><strong>Dirección:</strong> <span th:text="${vm.direccion}">—</span></li>
+            <li class="mb-1"><strong>Precio:</strong> <span th:text="${vm.precio}">—</span></li>
+            <li class="mb-1"><strong>Promedio estrellas:</strong> <span th:text="${vm.ratingText}">0.0</span> ★</li>
+            <li class="mb-1"><strong>Código categoría:</strong> <span th:text="${vm.categoriaCodigo}">—</span></li>
+          </ul>
+          <div class="divider"></div>
+          <p class="text-secondary mb-0">
+            * Agrega una descripción larga en tu entidad si deseas mostrar más detalles aquí.
+          </p>
         </div>
       </div>
 
-      <hr class="my-3">
+      <div class="col-12 col-lg-4">
+        <div class="card-soft p-3">
+          <h2 class="h6 text-secondary mb-2">Resumen</h2>
+          <div class="d-flex flex-column gap-2">
+            <div><span class="chip">Categoría</span> <span th:text="${vm.categoria}">—</span></div>
+            <div><span class="chip">Ciudad</span> <span th:text="${vm.ciudad}">—</span></div>
+            <div><span class="chip">País</span> <span th:text="${vm.pais}">—</span></div>
+          </div>
+          <div class="divider"></div>
+          <a href="/explorar/index" class="btn btn-primary w-100">Seguir explorando</a>
+        </div>
+      </div>
+    </div>
+  </main>
 
-      <p class="text-secondary m-0">
-        * Aquí podrías mostrar descripción si la agregas a la tabla <code>LUGAR</code>.
-      </p>
-    </section>
-  </div>
+  <script>
+    // Cambiar imagen principal al hacer click en una miniatura
+    document.addEventListener('click', (e) => {
+      const img = e.target.closest('.thumbs img');
+      if(!img) return;
+      const main = document.getElementById('mainImage');
+      document.querySelectorAll('.thumbs img').forEach(i => i.classList.remove('active'));
+      img.classList.add('active');
+      main.src = img.getAttribute('src');
+      main.scrollIntoView({behavior:'smooth', block:'center'});
+    });
+  </script>
 </body>
 </html>
